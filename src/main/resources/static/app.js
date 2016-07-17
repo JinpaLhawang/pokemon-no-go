@@ -249,11 +249,6 @@ class App extends React.Component {
             page={ this.state.wildPokemonList.page }
         />
 
-        <CreateDialog
-            attributes={ this.state.pokemonList.attributes }
-            onCreate={ this.onCreate }
-        />
-
         <PokemonList
             pokemons={ this.state.pokemonList.pokemons }
             links={ this.state.pokemonList.links }
@@ -264,6 +259,11 @@ class App extends React.Component {
             onNavigate={ this.onNavigate }
             onUpdate={ this.onUpdate }
             onDelete={ this.onDelete }
+        />
+
+        <CreateDialog
+            attributes={ this.state.pokemonList.attributes }
+            onCreate={ this.onCreate }
         />
 
       </div>
