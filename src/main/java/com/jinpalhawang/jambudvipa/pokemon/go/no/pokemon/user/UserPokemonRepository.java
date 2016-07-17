@@ -1,4 +1,4 @@
-package com.jinpalhawang.jambudvipa.pokemon.go.no;
+package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user;
 
 import java.util.List;
 

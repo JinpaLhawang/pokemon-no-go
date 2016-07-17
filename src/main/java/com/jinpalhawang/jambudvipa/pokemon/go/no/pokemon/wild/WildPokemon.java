@@ -1,12 +1,13 @@
-package com.jinpalhawang.jambudvipa.pokemon.go.no;
+package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-// Base Library
+// TODO: Change to reference Pokemon instead of replicating all Pokemon fields.
+// TODO: Add Location/Environment
 @Document
-public class Pokemon {
+public class WildPokemon {
 
   private @Id ObjectId id;
   private Integer number;
@@ -15,9 +16,9 @@ public class Pokemon {
   private String candyToEvolve;
   private Integer numCandyToEvolve;
 
-  private @SuppressWarnings("unused") Pokemon() {}
+  private @SuppressWarnings("unused") WildPokemon() {}
 
-  public Pokemon(
+  public WildPokemon(
       Integer number,
       String name,
       String type,
@@ -80,7 +81,7 @@ public class Pokemon {
 
   @Override
   public String toString() {
-    return "Pokemon [id=" + id + ", number=" + number + ", name=" + name + ", type=" + type + ", candyToEvolve="
+    return "WildPokemon [id=" + id + ", number=" + number + ", name=" + name + ", type=" + type + ", candyToEvolve="
         + candyToEvolve + ", numCandyToEvolve=" + numCandyToEvolve + "]";
   }
 

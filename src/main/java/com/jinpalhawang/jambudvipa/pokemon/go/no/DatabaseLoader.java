@@ -7,6 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.Pokemon;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.PokemonRepository;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemon;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemonRepository;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild.WildPokemon;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild.WildPokemonRepository;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.user.User;
+import com.jinpalhawang.jambudvipa.pokemon.go.no.user.UserRepository;
+
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 

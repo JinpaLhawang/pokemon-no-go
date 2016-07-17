@@ -1,4 +1,4 @@
-package com.jinpalhawang.jambudvipa.pokemon.go.no;
+package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user;
 
 import static com.jinpalhawang.jambudvipa.pokemon.go.no.WebSocketConfiguration.*;
 
