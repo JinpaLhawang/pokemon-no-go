@@ -1,14 +1,14 @@
 'use strict';
 
 const React = require('react');
+
 const client = require('./client');
-
 const follow = require('./follow');
-
 const stompClient = require('./websocket-listener');
 
-const CreateDialog = require('./create-dialog');
+const WildPokemonList = require('./wild-pokemon-list');
 const PokemonList = require('./pokemon-list');
+const CreateDialog = require('./create-dialog');
 
 const root = '/api';
 
@@ -16,17 +16,59 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { pokemons: [], attributes: [], page: 1, pageSize: 5, links: {} };
+    this.state = {
+      wildPokemonList: {
+        wildPokemons: [],
+        attributes: [],
+        page: 1,
+        pageSize: 9,
+        links: {}
+      },
+      pokemonList: {
+        pokemons: [],
+        attributes: [],
+        page: 1,
+        pageSize: 50,
+        links: {}
+      }
+    };
+
     this.updatePageSize = this.updatePageSize.bind(this);
     this.onNavigate = this.onNavigate.bind(this);
     this.onCreate = this.onCreate.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
+
+    this.refreshWildPokemonList = this.refreshWildPokemonList.bind(this);
     this.refreshCurrentPage = this.refreshCurrentPage.bind(this);
     this.refreshAndGoToLastPage = this.refreshAndGoToLastPage.bind(this);
   }
 
-  loadFromServer(pageSize) {
+  loadWildPokemonListFromServer(pageSize) {
+    let relArray = [ { rel: 'wildPokemons', params: { size: pageSize } } ];
+    follow(client, root, relArray).then(wildPokemonCollection => {
+      return client({
+        method: 'GET',
+        path: wildPokemonCollection.entity._links.profile.href,
+        headers: { 'Accept': 'application/schema+json' }
+      }).then(schema => {
+        this.schema = schema.entity;
+        return wildPokemonCollection;
+      });
+    }).done(wildPokemonCollection => {
+      this.setState({
+        wildPokemonList: {
+          wildPokemons: wildPokemonCollection.entity._embedded.wildPokemons,
+          links: wildPokemonCollection.entity._links,
+          attributes: Object.keys(this.schema.properties),
+          pageSize: pageSize,
+          page: wildPokemonCollection.entity.page
+        }
+      });
+    });
+  }
+
+  loadPokemonListFromServer(pageSize) {
     let relArray = [ { rel: 'pokemons', params: { size: pageSize } } ];
     follow(client, root, relArray).then(pokemonCollection => {
       return client({
@@ -39,18 +81,20 @@ class App extends React.Component {
       });
     }).done(pokemonCollection => {
       this.setState({
-        pokemons: pokemonCollection.entity._embedded.pokemons,
-        links: pokemonCollection.entity._links,
-        attributes: Object.keys(this.schema.properties),
-        pageSize: pageSize,
-        page: pokemonCollection.entity.page
+        pokemonList: {
+          pokemons: pokemonCollection.entity._embedded.pokemons,
+          links: pokemonCollection.entity._links,
+          attributes: Object.keys(this.schema.properties),
+          pageSize: pageSize,
+          page: pokemonCollection.entity.page
+        }
       });
     });
   }
 
   updatePageSize(pageSize) {
-    if (pageSize !== this.state.pageSize) {
-      this.loadFromServer(pageSize);
+    if (pageSize !== this.state.pokemonList.pageSize) {
+      this.loadPokemonListFromServer(pageSize);
     }
   }
 
@@ -60,11 +104,13 @@ class App extends React.Component {
       path: navUri
     }).done(pokemonCollection => {
       this.setState({
-        pokemons: pokemonCollection.entity._embedded.pokemons,
-        links: pokemonCollection.entity._links,
-        attributes: this.state.attributes,
-        pageSize: this.state.pageSize,
-        page: pokemonCollection.entity.page
+        pokemonList: {
+          pokemons: pokemonCollection.entity._embedded.pokemons,
+          links: pokemonCollection.entity._links,
+          attributes: this.state.pokemonList.attributes,
+          pageSize: this.state.pokemonList.pageSize,
+          page: pokemonCollection.entity.page
+        }
       });
     });
   }
@@ -97,8 +143,40 @@ class App extends React.Component {
     });
   }
 
+  refreshWildPokemonList(message) {
+    let relArray = [
+      {
+        rel: 'wildPokemons',
+        params: {
+          size: this.state.wildPokemonList.pageSize,
+          page: this.state.wildPokemonList.page.number
+        }
+      }
+    ];
+    follow(client, root, relArray).then(wildPokemonCollection => {
+      return client({
+        method: 'GET',
+        path: wildPokemonCollection.entity._links.profile.href,
+        headers: { 'Accept': 'application/schema+json' }
+      }).then(schema => {
+        this.schema = schema.entity;
+        return wildPokemonCollection;
+      });
+    }).done(wildPokemonCollection => {
+      this.setState({
+        wildPokemonList: {
+          wildPokemons: wildPokemonCollection.entity._embedded.wildPokemons,
+          links: wildPokemonCollection.entity._links,
+          attributes: Object.keys(this.schema.properties),
+          pageSize: this.state.wildPokemonList.pageSize,
+          page: wildPokemonCollection.entity.page
+        }
+      });
+    });
+  }
+
   refreshAndGoToLastPage(message) {
-    let relArray = [ { rel: 'pokemons', params: { size: this.state.pageSize } } ];
+    let relArray = [ { rel: 'pokemons', params: { size: this.state.pokemonList.pageSize } } ];
     follow(client, root, relArray).done(response => {
       if (response.entity._links.last !== undefined) {
         this.onNavigate(response.entity._links.last.href);
@@ -109,15 +187,15 @@ class App extends React.Component {
   }
 
   refreshCurrentPage(message) {
-    if (this.state.pokemons.length === 1) {
+    if (this.state.pokemonList.pokemons.length === 1) {
       this.refreshAndGoToLastPage(message);
     } else {
       let relArray = [
         {
           rel: 'pokemons',
           params: {
-            size: this.state.pageSize,
-            page: this.state.page.number
+            size: this.state.pokemonList.pageSize,
+            page: this.state.pokemonList.page.number
           }
         }
       ];
@@ -132,41 +210,56 @@ class App extends React.Component {
         });
       }).done(pokemonCollection => {
         this.setState({
-          pokemons: pokemonCollection.entity._embedded.pokemons,
-          links: pokemonCollection.entity._links,
-          attributes: Object.keys(this.schema.properties),
-          pageSize: this.state.pageSize,
-          page: pokemonCollection.entity.page
+          pokemonList: {
+            pokemons: pokemonCollection.entity._embedded.pokemons,
+            links: pokemonCollection.entity._links,
+            attributes: Object.keys(this.schema.properties),
+            pageSize: this.state.pokemonList.pageSize,
+            page: pokemonCollection.entity.page
+          }
         });
       });
     }
   }
 
   componentDidMount() {
-    this.loadFromServer(this.state.pageSize);
+    this.loadWildPokemonListFromServer(this.state.wildPokemonList.pageSize);
+    this.loadPokemonListFromServer(this.state.pokemonList.pageSize);
     stompClient.register([
       { route: '/topic/newPokemon', callback: this.refreshAndGoToLastPage },
       { route: '/topic/updatePokemon', callback: this.refreshCurrentPage },
-      { route: '/topic/deletePokemon', callback: this.refreshCurrentPage }
+      { route: '/topic/deletePokemon', callback: this.refreshCurrentPage },
+      { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
+      { route: '/topic/updateWildPokemon', callback: this.refreshWildPokemonList },
+      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList }
     ]);
   }
 
-  // TODO: Can order attributes?
   render() {
     return (
       <div>
 
+        <h1>Pokemon No Go</h1>
+
+        <WildPokemonList
+            wildPokemons={ this.state.wildPokemonList.wildPokemons }
+            links={ this.state.wildPokemonList.links }
+            attributes={ this.state.wildPokemonList.attributes }
+            pageSize={ this.state.wildPokemonList.pageSize }
+            page={ this.state.wildPokemonList.page }
+        />
+
         <CreateDialog
-            attributes={ this.state.attributes }
+            attributes={ this.state.pokemonList.attributes }
             onCreate={ this.onCreate }
         />
 
         <PokemonList
-            pokemons={ this.state.pokemons } 
-            links={ this.state.links }
-            attributes={ this.state.attributes }
-            pageSize={ this.state.pageSize }
-            page={ this.state.page }
+            pokemons={ this.state.pokemonList.pokemons }
+            links={ this.state.pokemonList.links }
+            attributes={ this.state.pokemonList.attributes }
+            pageSize={ this.state.pokemonList.pageSize }
+            page={ this.state.pokemonList.page }
             updatePageSize={ this.updatePageSize }
             onNavigate={ this.onNavigate }
             onUpdate={ this.onUpdate }

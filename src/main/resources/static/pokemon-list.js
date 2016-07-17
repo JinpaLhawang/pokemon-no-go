@@ -47,8 +47,9 @@ class PokemonList extends React.Component {
   }
 
   render() {
-    var pageInfo = this.props.page.hasOwnProperty('number') ?
-        <h3>Pokemons - Page { this.props.page.number + 1 } of { this.props.page.totalPages }</h3> : null;
+    var pageInfo = this.props.page.hasOwnProperty('number')
+        ? <h3>Pokemons - Page { this.props.page.number + 1 } of { this.props.page.totalPages }</h3>
+        : <h3>Pokemons</h3>;
 
     var pokemons = this.props.pokemons.map(pokemon =>
       <Pokemon
