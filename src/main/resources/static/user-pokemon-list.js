@@ -2,9 +2,9 @@
 
 const React = require('react');
 
-const Pokemon = require('./pokemon');
+const UserPokemon = require('./user-pokemon');
 
-class PokemonList extends React.Component {
+class UserPokemonList extends React.Component {
 
   constructor(props) {
     super(props);
@@ -19,7 +19,7 @@ class PokemonList extends React.Component {
     e.preventDefault();
     var pageSize = React.findDOMNode(this.refs.pageSize).value;
     if (/^[0-9]+$/.test(pageSize)) {
-      this.props.updatePokemonListPageSize(pageSize);
+      this.props.updateUserPokemonListPageSize(pageSize);
     } else {
       React.findDOMNode(this.refs.pageSize).value =
         pageSize.substring(0, pageSize.length - 1);
@@ -28,36 +28,34 @@ class PokemonList extends React.Component {
 
   handleNavFirst(e) {
     e.preventDefault();
-    this.props.onPokemonListNavigate(this.props.links.first.href);
+    this.props.onUserPokemonListNavigate(this.props.links.first.href);
   }
 
   handleNavPrev(e) {
     e.preventDefault();
-    this.props.onPokemonListNavigate(this.props.links.prev.href);
+    this.props.onUserPokemonListNavigate(this.props.links.prev.href);
   }
 
   handleNavNext(e) {
     e.preventDefault();
-    this.props.onPokemonListNavigate(this.props.links.next.href);
+    this.props.onUserPokemonListNavigate(this.props.links.next.href);
   }
 
   handleNavLast(e) {
     e.preventDefault();
-    this.props.onPokemonListNavigate(this.props.links.last.href);
+    this.props.onUserPokemonListNavigate(this.props.links.last.href);
   }
 
   render() {
     var pageInfo = this.props.page.hasOwnProperty('number')
-        ? <h3>Pokemons - Page { this.props.page.number + 1 } of { this.props.page.totalPages }</h3>
-        : <h3>Pokemons</h3>;
+        ? <h3>User Pokemons - Page { this.props.page.number + 1 } of { this.props.page.totalPages }</h3>
+        : <h3>User Pokemons</h3>;
 
-    var pokemons = this.props.pokemons.map(pokemon =>
-      <Pokemon
-          key={ pokemon._links.self.href }
-          pokemon={ pokemon }
+    var userPokemons = this.props.userPokemons.map(userPokemon =>
+      <UserPokemon
+          key={ userPokemon._links.self.href }
+          userPokemon={ userPokemon }
           attributes={ this.props.attributes }
-          onUpdate={ this.props.onUpdate }
-          onDelete={ this.props.onDelete }
       />
     );
 
@@ -88,14 +86,13 @@ class PokemonList extends React.Component {
 
         <table>
           <tr>
-            <th>Number</th>
             <th>Name</th>
             <th>Type</th>
+            <th>Combat Points</th>
+            <th>Health Points</th>
             <th>Candy Needed to Evolve</th>
-            <th></th>
-            <th></th>
           </tr>
-          { pokemons }
+          { userPokemons }
         </table>
 
         <div>{ navLinks }</div>
@@ -106,4 +103,4 @@ class PokemonList extends React.Component {
 
 }
 
-module.exports = PokemonList;
+module.exports = UserPokemonList;

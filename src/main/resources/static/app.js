@@ -7,6 +7,7 @@ const follow = require('./follow');
 const stompClient = require('./websocket-listener');
 
 const WildPokemonList = require('./wild-pokemon-list');
+const UserPokemonList = require('./user-pokemon-list');
 const PokemonList = require('./pokemon-list');
 const CreateDialog = require('./create-dialog');
 
@@ -24,6 +25,13 @@ class App extends React.Component {
         pageSize: 9,
         links: {}
       },
+      userPokemonList: {
+        userPokemons: [],
+        attributes: [],
+        page: 1,
+        pageSize: 50,
+        links: {}
+      },
       pokemonList: {
         pokemons: [],
         attributes: [],
@@ -33,17 +41,23 @@ class App extends React.Component {
       }
     };
 
-    this.updatePageSize = this.updatePageSize.bind(this);
-    this.onNavigate = this.onNavigate.bind(this);
+    this.updateUserPokemonListPageSize = this.updateUserPokemonListPageSize.bind(this);
+    this.onUserPokemonListNavigate = this.onUserPokemonListNavigate.bind(this);
+    this.updatePokemonListPageSize = this.updatePokemonListPageSize.bind(this);
+    this.onPokemonListNavigate = this.onPokemonListNavigate.bind(this);
+
     this.onCreate = this.onCreate.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
 
     this.refreshWildPokemonList = this.refreshWildPokemonList.bind(this);
-    this.refreshCurrentPage = this.refreshCurrentPage.bind(this);
-    this.refreshAndGoToLastPage = this.refreshAndGoToLastPage.bind(this);
+    this.refreshUserPokemonListCurrentPage = this.refreshUserPokemonListCurrentPage.bind(this);
+    this.refreshUserPokemonListAndGoToLastPage = this.refreshUserPokemonListAndGoToLastPage.bind(this);
+    this.refreshPokemonListCurrentPage = this.refreshPokemonListCurrentPage.bind(this);
+    this.refreshPokemonListAndGoToLastPage = this.refreshPokemonListAndGoToLastPage.bind(this);
   }
 
+  // LOAD
   loadWildPokemonListFromServer(pageSize) {
     let relArray = [ { rel: 'wildPokemons', params: { size: pageSize } } ];
     follow(client, root, relArray).then(wildPokemonCollection => {
@@ -63,6 +77,30 @@ class App extends React.Component {
           attributes: Object.keys(this.schema.properties),
           pageSize: pageSize,
           page: wildPokemonCollection.entity.page
+        }
+      });
+    });
+  }
+
+  loadUserPokemonListFromServer(pageSize) {
+    let relArray = [ { rel: 'userPokemons', params: { size: pageSize } } ];
+    follow(client, root, relArray).then(userPokemonCollection => {
+      return client({
+        method: 'GET',
+        path: userPokemonCollection.entity._links.profile.href,
+        headers: { 'Accept': 'application/schema+json' }
+      }).then(schema => {
+        this.schema = schema.entity;
+        return userPokemonCollection;
+      });
+    }).done(userPokemonCollection => {
+      this.setState({
+        userPokemonList: {
+          userPokemons: userPokemonCollection.entity._embedded.userPokemons,
+          links: userPokemonCollection.entity._links,
+          attributes: Object.keys(this.schema.properties),
+          pageSize: pageSize,
+          page: userPokemonCollection.entity.page
         }
       });
     });
@@ -92,13 +130,37 @@ class App extends React.Component {
     });
   }
 
-  updatePageSize(pageSize) {
+  // NAVIGATION
+  updateUserPokemonListPageSize(pageSize) {
+    if (pageSize !== this.state.userPokemonList.pageSize) {
+      this.loadUserPokemonListFromServer(pageSize);
+    }
+  }
+
+  onUserPokemonListNavigate(navUri) {
+    client({
+      method: 'GET',
+      path: navUri
+    }).done(userPokemonCollection => {
+      this.setState({
+        userPokemonList: {
+          userPokemons: userPokemonCollection.entity._embedded.userPokemons,
+          links: userPokemonCollection.entity._links,
+          attributes: this.state.userPokemonList.attributes,
+          pageSize: this.state.userPokemonList.pageSize,
+          page: userPokemonCollection.entity.page
+        }
+      });
+    });
+  }
+
+  updatePokemonListPageSize(pageSize) {
     if (pageSize !== this.state.pokemonList.pageSize) {
       this.loadPokemonListFromServer(pageSize);
     }
   }
 
-  onNavigate(navUri) {
+  onPokemonListNavigate(navUri) {
     client({
       method: 'GET',
       path: navUri
@@ -115,6 +177,7 @@ class App extends React.Component {
     });
   }
 
+  // CRUD
   onCreate(newPokemon) {
     let relArray = [ 'pokemons' ];
     follow(client, root, relArray).done(response => {
@@ -143,6 +206,7 @@ class App extends React.Component {
     });
   }
 
+  // REFRESH
   refreshWildPokemonList(message) {
     let relArray = [
       {
@@ -175,20 +239,67 @@ class App extends React.Component {
     });
   }
 
-  refreshAndGoToLastPage(message) {
-    let relArray = [ { rel: 'pokemons', params: { size: this.state.pokemonList.pageSize } } ];
+  refreshUserPokemonListAndGoToLastPage(message) {
+    let relArray = [ { rel: 'userPokemons', params: { size: this.state.userPokemonList.pageSize } } ];
     follow(client, root, relArray).done(response => {
       if (response.entity._links.last !== undefined) {
-        this.onNavigate(response.entity._links.last.href);
+        this.onUserPokemonListNavigate(response.entity._links.last.href);
       } else {
-        this.onNavigate(response.entity._links.self.href);
+        this.onUserPokemonListNavigate(response.entity._links.self.href);
       }
     });
   }
 
-  refreshCurrentPage(message) {
+  refreshUserPokemonListCurrentPage(message) {
+    if (this.state.userPokemonList.userPokemons.length === 1) {
+      this.refreshUserPokemonListAndGoToLastPage(message);
+    } else {
+      let relArray = [
+        {
+          rel: 'userPokemons',
+          params: {
+            size: this.state.userPokemonList.pageSize,
+            page: this.state.userPokemonList.page.number
+          }
+        }
+      ];
+      follow(client, root, relArray).then(userPokemonCollection => {
+        return client({
+          method: 'GET',
+          path: userPokemonCollection.entity._links.profile.href,
+          headers: { 'Accept': 'application/schema+json' }
+        }).then(schema => {
+          this.schema = schema.entity;
+          return userPokemonCollection;
+        });
+      }).done(userPokemonCollection => {
+        this.setState({
+          userPokemonList: {
+            userPokemons: userPokemonCollection.entity._embedded.userPokemons,
+            links: userPokemonCollection.entity._links,
+            attributes: Object.keys(this.schema.properties),
+            pageSize: this.state.userPokemonList.pageSize,
+            page: userPokemonCollection.entity.page
+          }
+        });
+      });
+    }
+  }
+
+  refreshPokemonListAndGoToLastPage(message) {
+    let relArray = [ { rel: 'pokemons', params: { size: this.state.pokemonList.pageSize } } ];
+    follow(client, root, relArray).done(response => {
+      if (response.entity._links.last !== undefined) {
+        this.onPokemonListNavigate(response.entity._links.last.href);
+      } else {
+        this.onPokemonListNavigate(response.entity._links.self.href);
+      }
+    });
+  }
+
+  refreshPokemonListCurrentPage(message) {
     if (this.state.pokemonList.pokemons.length === 1) {
-      this.refreshAndGoToLastPage(message);
+      this.refreshPokemonListAndGoToLastPage(message);
     } else {
       let relArray = [
         {
@@ -222,19 +333,25 @@ class App extends React.Component {
     }
   }
 
+  // INIT
   componentDidMount() {
     this.loadWildPokemonListFromServer(this.state.wildPokemonList.pageSize);
+    this.loadUserPokemonListFromServer(this.state.userPokemonList.pageSize);
     this.loadPokemonListFromServer(this.state.pokemonList.pageSize);
     stompClient.register([
-      { route: '/topic/newPokemon', callback: this.refreshAndGoToLastPage },
-      { route: '/topic/updatePokemon', callback: this.refreshCurrentPage },
-      { route: '/topic/deletePokemon', callback: this.refreshCurrentPage },
       { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
       { route: '/topic/updateWildPokemon', callback: this.refreshWildPokemonList },
-      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList }
+      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList },
+      { route: '/topic/newUserPokemon', callback: this.refreshUserPokemonListAndGoToLastPage },
+      { route: '/topic/updateUserPokemon', callback: this.refreshUserPokemonListCurrentPage },
+      { route: '/topic/deleteUserPokemon', callback: this.refreshUserPokemonListCurrentPage },
+      { route: '/topic/newPokemon', callback: this.refreshPokemonListAndGoToLastPage },
+      { route: '/topic/updatePokemon', callback: this.refreshPokemonListCurrentPage },
+      { route: '/topic/deletePokemon', callback: this.refreshPokemonListCurrentPage }
     ]);
   }
 
+  // RENDER
   render() {
     return (
       <div>
@@ -249,14 +366,24 @@ class App extends React.Component {
             page={ this.state.wildPokemonList.page }
         />
 
+        <UserPokemonList
+            userPokemons={ this.state.userPokemonList.userPokemons }
+            links={ this.state.userPokemonList.links }
+            attributes={ this.state.userPokemonList.attributes }
+            pageSize={ this.state.userPokemonList.pageSize }
+            page={ this.state.userPokemonList.page }
+            updateUserPokemonListPageSize={ this.updateUserPokemonListPageSize }
+            onUserPokemonListNavigate={ this.onUserPokemonListNavigate }
+        />
+
         <PokemonList
             pokemons={ this.state.pokemonList.pokemons }
             links={ this.state.pokemonList.links }
             attributes={ this.state.pokemonList.attributes }
             pageSize={ this.state.pokemonList.pageSize }
             page={ this.state.pokemonList.page }
-            updatePageSize={ this.updatePageSize }
-            onNavigate={ this.onNavigate }
+            updatePokemonListPageSize={ this.updatePokemonListPageSize }
+            onPokemonListNavigate={ this.onPokemonListNavigate }
             onUpdate={ this.onUpdate }
             onDelete={ this.onDelete }
         />

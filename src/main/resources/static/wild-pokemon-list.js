@@ -28,11 +28,8 @@ class WildPokemonList extends React.Component {
 
         <table>
           <tr>
-            <th>Number</th>
             <th>Name</th>
-            <th>Type</th>
-            <th>Combat Points</th>
-            <th>Health Points</th>
+            <th></th>
           </tr>
           { wildPokemons }
         </table>

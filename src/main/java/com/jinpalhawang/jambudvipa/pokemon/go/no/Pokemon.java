@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+// Base Library
 @Document
 public class Pokemon {
 
@@ -11,8 +12,6 @@ public class Pokemon {
   private Integer number;
   private String name;
   private String type;
-  private Integer combatPoints;
-  private Integer healthPoints;
   private String candyToEvolve;
   private Integer numCandyToEvolve;
 
@@ -22,15 +21,11 @@ public class Pokemon {
       Integer number,
       String name,
       String type,
-      Integer combatPoints,
-      Integer healthPoints,
       String candyToEvolve,
       Integer numCandyToEvolve) {
     this.number = number;
     this.name = name;
     this.type = type;
-    this.combatPoints = combatPoints;
-    this.healthPoints = healthPoints;
     this.candyToEvolve = candyToEvolve;
     this.numCandyToEvolve = numCandyToEvolve;
   }
@@ -49,14 +44,6 @@ public class Pokemon {
 
   public String getType() {
     return type;
-  }
-
-  public Integer getCombatPoints() {
-    return combatPoints;
-  }
-
-  public Integer getHealthPoints() {
-    return healthPoints;
   }
 
   public String getCandyToEvolve() {
@@ -83,14 +70,6 @@ public class Pokemon {
     this.type = type;
   }
 
-  public void setCombatPoints(Integer combatPoints) {
-    this.combatPoints = combatPoints;
-  }
-
-  public void setHealthPoints(Integer healthPoints) {
-    this.healthPoints = healthPoints;
-  }
-
   public void setCandyToEvolve(String candyToEvolve) {
     this.candyToEvolve = candyToEvolve;
   }
@@ -101,9 +80,8 @@ public class Pokemon {
 
   @Override
   public String toString() {
-    return "Pokemon [id=" + id + ", number=" + number + ", name=" + name + ", type=" + type + ", combatPoints="
-        + combatPoints + ", healthPoints=" + healthPoints + ", candyToEvolve=" + candyToEvolve + ", numCandyToEvolve="
-        + numCandyToEvolve + "]";
+    return "Pokemon [id=" + id + ", number=" + number + ", name=" + name + ", type=" + type + ", candyToEvolve="
+        + candyToEvolve + ", numCandyToEvolve=" + numCandyToEvolve + "]";
   }
 
 }

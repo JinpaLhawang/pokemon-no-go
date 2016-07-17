@@ -21,9 +21,11 @@ class Pokemon extends React.Component {
         <td>{ this.props.pokemon.number }</td>
         <td>{ this.props.pokemon.name }</td>
         <td>{ this.props.pokemon.type }</td>
-        <td>{ this.props.pokemon.combatPoints }</td>
-        <td>{ this.props.pokemon.healthPoints }</td>
-        <td>{ this.props.pokemon.numCandyToEvolve } { this.props.pokemon.candyToEvolve }</td>
+        <td>
+          { this.props.pokemon.numCandyToEvolve ? this.props.pokemon.numCandyToEvolve : null }
+          &nbsp;
+          { this.props.pokemon.candyToEvolve }
+        </td>
         <td>
           <UpdateDialog
               pokemon={ this.props.pokemon }

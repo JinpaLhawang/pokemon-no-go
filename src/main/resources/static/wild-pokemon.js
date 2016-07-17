@@ -11,11 +11,12 @@ class WildPokemon extends React.Component {
   render() {
     return (
       <tr>
-        <td>{ this.props.wildPokemon.number }</td>
         <td>{ this.props.wildPokemon.name }</td>
-        <td>{ this.props.wildPokemon.type }</td>
-        <td>{ this.props.wildPokemon.combatPoints }</td>
-        <td>{ this.props.wildPokemon.healthPoints }</td>
+        <td>
+          <button onClick={ this.handleInspect }>
+            Inspect
+          </button>
+        </td>
       </tr>
     )
   }

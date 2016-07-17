@@ -3,7 +3,6 @@ package com.jinpalhawang.jambudvipa.pokemon.go.no;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -11,55 +10,80 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-  private final PokemonRepository pokemonRepository;
-  private final WildPokemonRepository wildPokemonRepository;
+  private final PokemonRepository pokemonRepo;
+  private final WildPokemonRepository wildPokemonRepo;
+  private final UserRepository userRepo;
+  private final UserPokemonRepository userPokemonRepo;
 
   @Autowired
-  public DatabaseLoader(PokemonRepository pokemonRepository, WildPokemonRepository wildPokemonRepository) {
-    this.pokemonRepository = pokemonRepository;
-    this.wildPokemonRepository = wildPokemonRepository;
+  public DatabaseLoader(
+      PokemonRepository pokemonRepo,
+      WildPokemonRepository wildPokemonRepo,
+      UserRepository userRepo,
+      UserPokemonRepository userPokemonRepo) {
+    this.pokemonRepo = pokemonRepo;
+    this.wildPokemonRepo = wildPokemonRepo;
+    this.userRepo = userRepo;
+    this.userPokemonRepo = userPokemonRepo;
   }
 
   @Override
   public void run(String... args) throws Exception {
 
-    pokemonRepository.deleteAll();
-    wildPokemonRepository.deleteAll();
+    // POKEMON
+    pokemonRepo.deleteAll();
 
-    pokemonRepository.save(new Pokemon(1, "Bulbasaur", "Grass/Poison", 14, 10, "Bulbasaur Candy", 25));
-    pokemonRepository.save(new Pokemon(13, "Weedle", "Bug/Poison", 50, 26, "Weedle Candy", 15));
-    pokemonRepository.save(new Pokemon(14, "Kakuna", "Bug/Poison", 50, 28, "Weedle Candy", 50));
+    pokemonRepo.save(new Pokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25));
+    pokemonRepo.save(new Pokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15));
+    pokemonRepo.save(new Pokemon(14, "Kakuna", "Bug/Poison", "Weedle Candy", 50));
+    pokemonRepo.save(new Pokemon(19, "Rattata", "Normal", "Rattata Candy", 25));
+    pokemonRepo.save(new Pokemon(20, "Raticate", "Normal", "", 0));
 
-    wildPokemonRepository.save(new WildPokemon(19, "Rattata", "Normal", 10, 10, "Rattata Candy", 25));
-    wildPokemonRepository.save(new WildPokemon(20, "Raticate", "Normal", 50, 14, null, null));
-
-    List<ObjectId> pokemonIds = new ArrayList<ObjectId>();
-
-    System.out.println("\nPokemons found with findAll():");
-    for (Pokemon pokemon : pokemonRepository.findAll()) {
+    System.out.println("\n\n\nPokemon found with findAll():");
+    for (final Pokemon pokemon : pokemonRepo.findAll()) {
       System.out.println(pokemon);
-      pokemonIds.add(pokemon.getId());
     }
 
-    System.out.println("\nPokemons found with findByIdIn(pokemonIds):");
-    pokemonIds.remove(0);
-    System.out.println(pokemonRepository.findByIdIn(pokemonIds));
+    // WILD POKEMON
+    wildPokemonRepo.deleteAll();
 
-    System.out.println();
+    wildPokemonRepo.save(new WildPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15));
+    wildPokemonRepo.save(new WildPokemon(19, "Rattata", "Normal", "Rattata Candy", 25));
 
-    List<ObjectId> wildPokemonIds = new ArrayList<ObjectId>();
-
-    System.out.println("\nWild Pokemons found with findAll():");
-    for (WildPokemon wildPokemon : wildPokemonRepository.findAll()) {
+    System.out.println("\n\n\nWild Pokemons found with findAll():");
+    for (final WildPokemon wildPokemon : wildPokemonRepo.findAll()) {
       System.out.println(wildPokemon);
-      wildPokemonIds.add(wildPokemon.getId());
     }
 
-    System.out.println("\nWild Pokemons found with findByIdIn(wildPokemonIds):");
-    wildPokemonIds.remove(0);
-    System.out.println(wildPokemonRepository.findByIdIn(wildPokemonIds));
+    // USER POKEMON
+    userPokemonRepo.deleteAll();
 
-    System.out.println();
+    final UserPokemon jinpaBulbasaur1 = userPokemonRepo.save(new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25, 14, 10, true, false, false));
+    final UserPokemon jinpaWeedle1 = userPokemonRepo.save(new UserPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15, 50, 26, true, false, false));
+    final UserPokemon jinpaKaruna1 = userPokemonRepo.save(new UserPokemon(14, "Kakuna", "Bug/Poison", "Weedle Candy", 50, 50, 28, true, false, false));
+
+    System.out.println("\n\n\nUser Pokemons found with findAll():");
+    for (UserPokemon userPokemon : userPokemonRepo.findAll()) {
+      System.out.println(userPokemon);
+    }
+
+    // USER
+    userRepo.deleteAll();
+
+    final List<UserPokemon> jinpaBackpack = new ArrayList<UserPokemon>();
+    jinpaBackpack.add(jinpaBulbasaur1);
+    jinpaBackpack.add(jinpaWeedle1);
+    jinpaBackpack.add(jinpaKaruna1);
+
+    userRepo.save(new User("JinpaLhawang", jinpaBackpack));
+
+    System.out.println("\n\n\nUsers found with findAll():");
+    for (final User user : userRepo.findAll()) {
+      System.out.println(user);
+    }
+
+    System.out.println("\n\n\n");
+
   }
 
 }
