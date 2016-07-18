@@ -8,3 +8,4 @@ src/main/resources/static/built/
 src/main/resources/static/etc/
 src/main/resources/static/node/
 src/main/resources/static/node_modules/
+*.log
