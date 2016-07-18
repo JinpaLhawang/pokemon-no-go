@@ -35,18 +35,6 @@ java -jar target/pokemon-no-go-0.0.1-SNAPSHOT.jar
 
 http://localhost:8080
 
-## Inserting Data Locally
-
-```
-curl -X POST 'http://localhost:8080/api/pokemons' -d '{ "number": 1, "name": "Bulbasaur", "type": "Grass/Poison", "candyToEvolve": "Bulbasaur", "numCandyToEvolve": 25, "combatPoints": 14, "healthPoints": 10 }' -H 'Content-Type: application/json'
-```
-
-## Requesting Data Locally
-
-```
-curl 'http://localhost:8080/api/pokemons'
-```
-
 ## Running in Pivotal Cloud Foundry Dev
 
 Setup:
