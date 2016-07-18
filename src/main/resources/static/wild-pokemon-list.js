@@ -30,7 +30,7 @@ class WildPokemonList extends React.Component {
         <table>
           <tr>
             <th>Name</th>
-            <th></th>
+            <th>Capture</th>
           </tr>
           { wildPokemons }
         </table>
