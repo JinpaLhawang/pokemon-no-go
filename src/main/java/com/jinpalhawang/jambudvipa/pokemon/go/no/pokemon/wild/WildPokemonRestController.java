@@ -26,16 +26,20 @@ public class WildPokemonRestController {
   public void capture(@PathVariable String wildPokemonId) {
 
     final WildPokemon wildPokemon = wildPokemonRepo.findOne(wildPokemonId);
+    System.out.println("Capturing Wild Pokemon...");
     System.out.println(wildPokemon);
 
+    wildPokemonRepo.delete(wildPokemon);
+
     final UserPokemon userPokemon = userPokemonRepo.insert(
-        new UserPokemon(wildPokemon.getNumber(), wildPokemon.getName(), wildPokemon.getType(),
-            wildPokemon.getCandyToEvolve(), wildPokemon.getNumCandyToEvolve(), 10, 10, false, false, false));
+        new UserPokemon(wildPokemon.getNumber(), wildPokemon.getName(),
+            wildPokemon.getType(), wildPokemon.getCandyToEvolve(),
+            wildPokemon.getNumCandyToEvolve(), 10, 10, true, false, false));
+    System.out.println("Caught Wild Pokemon...");
     System.out.println(userPokemon);
 
     final User user = userRepo.findByName("JinpaLhawang");
     user.getBackpack().add(userPokemon);
-    System.out.println(user);
   }
 
 }

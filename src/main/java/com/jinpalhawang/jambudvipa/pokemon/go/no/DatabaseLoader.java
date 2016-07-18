@@ -7,31 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.Pokemon;
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.PokemonRepository;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemon;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemonRepository;
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild.WildPokemon;
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild.WildPokemonRepository;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.user.User;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.user.UserRepository;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-  private final PokemonRepository pokemonRepo;
-  private final WildPokemonRepository wildPokemonRepo;
   private final UserRepository userRepo;
   private final UserPokemonRepository userPokemonRepo;
 
   @Autowired
   public DatabaseLoader(
-      PokemonRepository pokemonRepo,
-      WildPokemonRepository wildPokemonRepo,
       UserRepository userRepo,
       UserPokemonRepository userPokemonRepo) {
-    this.pokemonRepo = pokemonRepo;
-    this.wildPokemonRepo = wildPokemonRepo;
     this.userRepo = userRepo;
     this.userPokemonRepo = userPokemonRepo;
   }
@@ -39,35 +29,12 @@ public class DatabaseLoader implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
 
-    // POKEMON
-    pokemonRepo.deleteAll();
-
-    pokemonRepo.save(new Pokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25));
-    pokemonRepo.save(new Pokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 12));
-    pokemonRepo.save(new Pokemon(16, "Pidgey", "Normal/Flying", "Pidgey Candy", 12));
-    pokemonRepo.save(new Pokemon(19, "Rattata", "Normal", "Rattata Candy", 25));
-
-    System.out.println("\n\n\nPokemon found with findAll():");
-    for (final Pokemon pokemon : pokemonRepo.findAll()) {
-      System.out.println(pokemon);
-    }
-
-    // WILD POKEMON
-    wildPokemonRepo.deleteAll();
-
-    wildPokemonRepo.save(new WildPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 12));
-    wildPokemonRepo.save(new WildPokemon(16, "Pidgey", "Normal/Flying", "Pidgey Candy", 12));
-
-    System.out.println("\n\n\nWild Pokemons found with findAll():");
-    for (final WildPokemon wildPokemon : wildPokemonRepo.findAll()) {
-      System.out.println(wildPokemon);
-    }
-
     // USER POKEMON
     userPokemonRepo.deleteAll();
 
-    final UserPokemon jinpaBulbasaur = userPokemonRepo.save(
-        new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25, 14, 10, true, false, false));
+    final UserPokemon jinpaBulbasaur = userPokemonRepo.insert(
+        new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy",
+            25, 14, 10, true, false, false));
 
     System.out.println("\n\n\nUser Pokemons found with findAll():");
     for (UserPokemon userPokemon : userPokemonRepo.findAll()) {
@@ -80,7 +47,7 @@ public class DatabaseLoader implements CommandLineRunner {
     final List<UserPokemon> jinpaBackpack = new ArrayList<UserPokemon>();
     jinpaBackpack.add(jinpaBulbasaur);
 
-    userRepo.save(new User("JinpaLhawang", jinpaBackpack));
+    userRepo.insert(new User("JinpaLhawang", jinpaBackpack));
 
     System.out.println("\n\n\nUsers found with findAll():");
     for (final User user : userRepo.findAll()) {
