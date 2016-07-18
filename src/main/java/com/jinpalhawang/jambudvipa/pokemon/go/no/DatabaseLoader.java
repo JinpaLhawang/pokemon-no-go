@@ -43,10 +43,9 @@ public class DatabaseLoader implements CommandLineRunner {
     pokemonRepo.deleteAll();
 
     pokemonRepo.save(new Pokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25));
-    pokemonRepo.save(new Pokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15));
-    pokemonRepo.save(new Pokemon(14, "Kakuna", "Bug/Poison", "Weedle Candy", 50));
+    pokemonRepo.save(new Pokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 12));
+    pokemonRepo.save(new Pokemon(16, "Pidgey", "Normal/Flying", "Pidgey Candy", 12));
     pokemonRepo.save(new Pokemon(19, "Rattata", "Normal", "Rattata Candy", 25));
-    pokemonRepo.save(new Pokemon(20, "Raticate", "Normal", "", 0));
 
     System.out.println("\n\n\nPokemon found with findAll():");
     for (final Pokemon pokemon : pokemonRepo.findAll()) {
@@ -56,8 +55,8 @@ public class DatabaseLoader implements CommandLineRunner {
     // WILD POKEMON
     wildPokemonRepo.deleteAll();
 
-    wildPokemonRepo.save(new WildPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15));
-    wildPokemonRepo.save(new WildPokemon(19, "Rattata", "Normal", "Rattata Candy", 25));
+    wildPokemonRepo.save(new WildPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 12));
+    wildPokemonRepo.save(new WildPokemon(16, "Pidgey", "Normal/Flying", "Pidgey Candy", 12));
 
     System.out.println("\n\n\nWild Pokemons found with findAll():");
     for (final WildPokemon wildPokemon : wildPokemonRepo.findAll()) {
@@ -67,9 +66,8 @@ public class DatabaseLoader implements CommandLineRunner {
     // USER POKEMON
     userPokemonRepo.deleteAll();
 
-    final UserPokemon jinpaBulbasaur1 = userPokemonRepo.save(new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25, 14, 10, true, false, false));
-    final UserPokemon jinpaWeedle1 = userPokemonRepo.save(new UserPokemon(13, "Weedle", "Bug/Poison", "Weedle Candy", 15, 50, 26, true, false, false));
-    final UserPokemon jinpaKaruna1 = userPokemonRepo.save(new UserPokemon(14, "Kakuna", "Bug/Poison", "Weedle Candy", 50, 50, 28, true, false, false));
+    final UserPokemon jinpaBulbasaur = userPokemonRepo.save(
+        new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy", 25, 14, 10, true, false, false));
 
     System.out.println("\n\n\nUser Pokemons found with findAll():");
     for (UserPokemon userPokemon : userPokemonRepo.findAll()) {
@@ -80,9 +78,7 @@ public class DatabaseLoader implements CommandLineRunner {
     userRepo.deleteAll();
 
     final List<UserPokemon> jinpaBackpack = new ArrayList<UserPokemon>();
-    jinpaBackpack.add(jinpaBulbasaur1);
-    jinpaBackpack.add(jinpaWeedle1);
-    jinpaBackpack.add(jinpaKaruna1);
+    jinpaBackpack.add(jinpaBulbasaur);
 
     userRepo.save(new User("JinpaLhawang", jinpaBackpack));
 
