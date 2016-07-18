@@ -46,6 +46,7 @@ class App extends React.Component {
     this.updatePokemonListPageSize = this.updatePokemonListPageSize.bind(this);
     this.onPokemonListNavigate = this.onPokemonListNavigate.bind(this);
 
+    this.onWildPokemonCapture = this.onWildPokemonCapture.bind(this);
     this.onCreate = this.onCreate.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
@@ -178,6 +179,14 @@ class App extends React.Component {
   }
 
   // CRUD
+  onWildPokemonCapture(wildPokemon) {
+    console.log('Capturing wildPokemon', wildPokemon);
+    client({
+      method: 'GET',
+      path: '/api/' + wildPokemon.id + '/capture'
+    });
+  }
+
   onCreate(newPokemon) {
     let relArray = [ 'pokemons' ];
     follow(client, root, relArray).done(response => {
@@ -364,6 +373,7 @@ class App extends React.Component {
             attributes={ this.state.wildPokemonList.attributes }
             pageSize={ this.state.wildPokemonList.pageSize }
             page={ this.state.wildPokemonList.page }
+            onWildPokemonCapture={ this.onWildPokemonCapture }
         />
 
         <UserPokemonList

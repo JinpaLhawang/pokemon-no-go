@@ -17,6 +17,7 @@ class WildPokemonList extends React.Component {
           key={ wildPokemon._links.self.href }
           wildPokemon={ wildPokemon }
           attributes={ this.props.attributes }
+          onWildPokemonCapture={ this.props.onWildPokemonCapture }
       />
     );
     }

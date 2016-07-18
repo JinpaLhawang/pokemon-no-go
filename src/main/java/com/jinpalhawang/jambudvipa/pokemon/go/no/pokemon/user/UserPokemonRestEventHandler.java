@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RepositoryEventHandler(UserPokemon.class)
-public class UserPokemonEventHandler {
+public class UserPokemonRestEventHandler {
 
   private final SimpMessagingTemplate websocket;
   private final EntityLinks entityLinks;
 
   @Autowired
-  public UserPokemonEventHandler(SimpMessagingTemplate websocket, EntityLinks entityLinks) {
+  public UserPokemonRestEventHandler(SimpMessagingTemplate websocket, EntityLinks entityLinks) {
     this.websocket = websocket;
     this.entityLinks = entityLinks;
   }

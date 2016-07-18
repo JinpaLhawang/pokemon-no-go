@@ -6,6 +6,11 @@ class WildPokemon extends React.Component {
 
   constructor(props) {
     super(props);
+    this.handleCapture = this.handleCapture.bind(this);
+  }
+
+  handleCapture() {
+    this.props.onWildPokemonCapture(this.props.wildPokemon);
   }
 
   render() {
@@ -13,8 +18,8 @@ class WildPokemon extends React.Component {
       <tr>
         <td>{ this.props.wildPokemon.name }</td>
         <td>
-          <button onClick={ this.handleInspect }>
-            Inspect
+          <button onClick={ this.handleCapture }>
+            Capture
           </button>
         </td>
       </tr>
