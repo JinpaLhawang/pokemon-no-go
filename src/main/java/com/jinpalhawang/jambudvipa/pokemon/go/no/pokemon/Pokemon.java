@@ -1,6 +1,5 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Pokemon {
 
-  private @Id ObjectId id;
+  private @Id String id;
   private Integer number;
   private String name;
   private String type;
@@ -30,7 +29,7 @@ public class Pokemon {
     this.numCandyToEvolve = numCandyToEvolve;
   }
 
-  public ObjectId getId() {
+  public String getId() {
     return id;
   }
 
@@ -54,7 +53,7 @@ public class Pokemon {
     return numCandyToEvolve;
   }
 
-  public void setId(ObjectId id) {
+  public void setId(String id) {
     this.id = id;
   }
 
