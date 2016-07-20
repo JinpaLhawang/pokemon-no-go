@@ -3,6 +3,8 @@ package com.jinpalhawang.jambudvipa.pokemon.go.no;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,9 @@ import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild.WildPokemonReposit
 
 @Component
 public class WildPokemonGenerator implements CommandLineRunner {
+
+  private static final Logger log =
+      LoggerFactory.getLogger(WildPokemonGenerator.class);
 
   private final PokemonRepository pokemonRepo;
   private final WildPokemonRepository wildPokemonRepo;
@@ -50,19 +55,15 @@ public class WildPokemonGenerator implements CommandLineRunner {
         if (!wildPokemons.isEmpty()) {
           final WildPokemon wildPokemon = wildPokemons.get(
               random.nextInt(wildPokemons.size()));
+          log.info("Wild Pokemon went away: " + wildPokemon);
           wildPokemonRepo.delete(wildPokemon);
-          System.out.println("\nWild Pokemon went away...");
-          System.out.println(wildPokemon);
-          System.out.println();
         }
       }
       Thread.sleep(5000);
       if (random.nextInt(10) > 6) {
         final List<Pokemon> pokemons = pokemonRepo.findAll();
         final Pokemon pokemon = pokemons.get(random.nextInt(pokemons.size()));
-        System.out.println("\nSpawning random Pokemon...");
-        System.out.println(pokemon);
-        System.out.println();
+        log.info("Spawning random Pokemon: " + pokemon);
         wildPokemonRepo.insert(new WildPokemon(pokemon.getNumber(),
             pokemon.getName(), pokemon.getType(), pokemon.getCandyToEvolve(),
             pokemon.getNumCandyToEvolve()));

@@ -1,5 +1,7 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,9 @@ import com.jinpalhawang.jambudvipa.pokemon.go.no.user.UserRepository;
 
 @RestController
 public class WildPokemonRestController {
+
+  private static final Logger log =
+      LoggerFactory.getLogger(WildPokemonRestController.class);
 
   @Autowired
   private UserRepository userRepo;
@@ -26,8 +31,7 @@ public class WildPokemonRestController {
   public void capture(@PathVariable String wildPokemonId) {
 
     final WildPokemon wildPokemon = wildPokemonRepo.findOne(wildPokemonId);
-    System.out.println("Capturing Wild Pokemon...");
-    System.out.println(wildPokemon);
+    log.info("Capturing Wild Pokemon: " + wildPokemon);
 
     wildPokemonRepo.delete(wildPokemon);
 
@@ -35,8 +39,7 @@ public class WildPokemonRestController {
         new UserPokemon(wildPokemon.getNumber(), wildPokemon.getName(),
             wildPokemon.getType(), wildPokemon.getCandyToEvolve(),
             wildPokemon.getNumCandyToEvolve(), 10, 10, true, false, false));
-    System.out.println("Caught Wild Pokemon...");
-    System.out.println(userPokemon);
+    log.info("Caught Wild Pokemon: " + userPokemon);
 
     final User user = userRepo.findByName("JinpaLhawang");
     user.getBackpack().add(userPokemon);
