@@ -36,26 +36,12 @@ public class DatabaseLoader implements CommandLineRunner {
         new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy",
             25, 14, 10, true, false, false));
 
-    System.out.println("\n\n\nUser Pokemons found with findAll():");
-    for (UserPokemon userPokemon : userPokemonRepo.findAll()) {
-      System.out.println(userPokemon);
-    }
-
     // USER
     userRepo.deleteAll();
 
     final List<UserPokemon> jinpaBackpack = new ArrayList<UserPokemon>();
     jinpaBackpack.add(jinpaBulbasaur);
-
     userRepo.insert(new User("JinpaLhawang", jinpaBackpack));
-
-    System.out.println("\n\n\nUsers found with findAll():");
-    for (final User user : userRepo.findAll()) {
-      System.out.println(user);
-    }
-
-    System.out.println("\n\n\n");
-
   }
 
 }
