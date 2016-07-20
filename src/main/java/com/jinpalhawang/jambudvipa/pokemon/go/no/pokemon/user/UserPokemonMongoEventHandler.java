@@ -23,14 +23,14 @@ public class UserPokemonMongoEventHandler
 
   @Override
   public void onAfterSave(AfterSaveEvent<UserPokemon> event) {
-    log.info("AfterSaveEvent: " + event.getSource());
+    log.info("MongoDB AfterSaveEvent: " + event.getSource());
     this.websocket.convertAndSend(
         WebSocketConfiguration.MESSAGE_PREFIX + "/newUserPokemon", "");
   }
 
   @Override
   public void onAfterDelete(AfterDeleteEvent<UserPokemon> event) {
-    log.info("AfterDeleteEvent: " + event.getSource());
+    log.info("MongoDB AfterDeleteEvent: " + event.getSource());
     this.websocket.convertAndSend(
         WebSocketConfiguration.MESSAGE_PREFIX + "/deleteUserPokemon", "");
   }

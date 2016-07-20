@@ -23,14 +23,14 @@ public class WildPokemonMongoEventHandler
 
   @Override
   public void onAfterSave(AfterSaveEvent<WildPokemon> event) {
-    log.info("AfterSaveEvent: " + event.getSource());
+    log.info("MongoDB AfterSaveEvent: " + event.getSource());
     this.websocket.convertAndSend(
         WebSocketConfiguration.MESSAGE_PREFIX + "/newWildPokemon", "");
   }
 
   @Override
   public void onAfterDelete(AfterDeleteEvent<WildPokemon> event) {
-    log.info("AfterDeleteEvent: " + event.getSource());
+    log.info("MongoDB AfterDeleteEvent: " + event.getSource());
     this.websocket.convertAndSend(
         WebSocketConfiguration.MESSAGE_PREFIX + "/deleteWildPokemon", "");
   }

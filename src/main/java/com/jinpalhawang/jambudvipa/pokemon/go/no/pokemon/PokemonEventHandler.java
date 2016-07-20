@@ -31,19 +31,19 @@ public class PokemonEventHandler {
 
   @HandleAfterCreate
   public void newPokemon(Pokemon pokemon) {
-    log.info("HandleAfterCreate: " + pokemon);
+    log.info("REST HandleAfterCreate: " + pokemon);
     this.websocket.convertAndSend(MESSAGE_PREFIX + "/newPokemon", getPath(pokemon));
   }
 
   @HandleAfterSave
   public void updatePokemon(Pokemon pokemon) {
-    log.info("HandleAfterSave: " + pokemon);
+    log.info("REST HandleAfterSave: " + pokemon);
     this.websocket.convertAndSend(MESSAGE_PREFIX + "/updatePokemon", getPath(pokemon));
   }
 
   @HandleAfterDelete
   public void deletePokemon(Pokemon pokemon) {
-    log.info("HandleAfterDelete: " + pokemon);
+    log.info("REST HandleAfterDelete: " + pokemon);
     this.websocket.convertAndSend(MESSAGE_PREFIX + "/deletePokemon", getPath(pokemon));
   }
 
