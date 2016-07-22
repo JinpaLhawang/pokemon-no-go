@@ -381,23 +381,33 @@ class App extends React.Component {
 
         <h1>Pokemon No Go</h1>
 
-        <a href='#' onClick={ this.switchToJinpaLhawang }>
+        <a href="#" onClick={ this.switchToJinpaLhawang }>
           JinpaLhawang
         </a>
         &nbsp;|&nbsp;
-        <a href='#' onClick={ this.switchToRaoul }>
+        <a href="#" onClick={ this.switchToRaoul }>
           Raoul
         </a>
 
-        <WildPokemonList
-            userName={ this.state.user.name }
-            wildPokemons={ this.state.wildPokemonList.wildPokemons }
-            links={ this.state.wildPokemonList.links }
-            attributes={ this.state.wildPokemonList.attributes }
-            pageSize={ this.state.wildPokemonList.pageSize }
-            page={ this.state.wildPokemonList.page }
-            onWildPokemonCapture={ this.onWildPokemonCapture }
-        />
+        <div className="row">
+
+          <div className="col-md-4">Communication (Logs/Notifications)</div>
+
+          <div className="col-md-4">
+            <WildPokemonList
+                userName={ this.state.user.name }
+                wildPokemons={ this.state.wildPokemonList.wildPokemons }
+                links={ this.state.wildPokemonList.links }
+                attributes={ this.state.wildPokemonList.attributes }
+                pageSize={ this.state.wildPokemonList.pageSize }
+                page={ this.state.wildPokemonList.page }
+                onWildPokemonCapture={ this.onWildPokemonCapture }
+            />
+          </div>
+
+          <div className="col-md-4">User</div>
+
+        </div>
 
         <UserPokemonList
             userName={ this.state.user.name }
