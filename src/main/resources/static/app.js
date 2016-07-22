@@ -17,7 +17,11 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
+      user: {
+        name: ''
+      },
       wildPokemonList: {
         wildPokemons: [],
         attributes: [],
@@ -41,6 +45,8 @@ class App extends React.Component {
       }
     };
 
+    this.handleUserNameInput = this.handleUserNameInput.bind(this);
+
     this.updateUserPokemonListPageSize = this.updateUserPokemonListPageSize.bind(this);
     this.onUserPokemonListNavigate = this.onUserPokemonListNavigate.bind(this);
     this.updatePokemonListPageSize = this.updatePokemonListPageSize.bind(this);
@@ -56,6 +62,27 @@ class App extends React.Component {
     this.refreshUserPokemonListAndGoToLastPage = this.refreshUserPokemonListAndGoToLastPage.bind(this);
     this.refreshPokemonListCurrentPage = this.refreshPokemonListCurrentPage.bind(this);
     this.refreshPokemonListAndGoToLastPage = this.refreshPokemonListAndGoToLastPage.bind(this);
+  }
+
+  handleUserNameInput(e) {
+    e.preventDefault();
+    var userName = React.findDOMNode(this.refs.userName).value;
+    console.log('userName:', userName);
+    if (/^[a-zA-Z0-9]+$/.test(userName)) {
+      this.setState({
+        user: {
+          name: userName
+        }
+      });
+      React.findDOMNode(this.refs.userName).value = userName;
+      if (e.key === 'Enter') {
+        console.log('Enter Pressed!');
+        //this.props.setUserName(userName);
+      }
+    } else {
+      React.findDOMNode(this.refs.userName).value =
+        userName.substring(0, userName.length - 1);
+    }
   }
 
   // LOAD
@@ -129,6 +156,14 @@ class App extends React.Component {
         }
       });
     });
+  }
+
+  // USER
+  updateUserName(name) {
+    if (name !== this.state.user.name) {
+      console.log('Changing name from ' + this.state.user.name + ' to ' + name);
+      this.state.user.name = name;
+    }
   }
 
   // NAVIGATION
@@ -366,6 +401,14 @@ class App extends React.Component {
       <div>
 
         <h1>Pokemon No Go</h1>
+
+        <div>
+          <input
+              ref='userName'
+              defaultValue='JinpaLhawang'
+              onKeyPress={ this.handleUserNameInput }
+          />
+        </div>
 
         <WildPokemonList
             wildPokemons={ this.state.wildPokemonList.wildPokemons }

@@ -21,6 +21,7 @@ class UserPokemonList extends React.Component {
     if (/^[0-9]+$/.test(pageSize)) {
       this.props.updateUserPokemonListPageSize(pageSize);
     } else {
+      // Erase the invalid character
       React.findDOMNode(this.refs.pageSize).value =
         pageSize.substring(0, pageSize.length - 1);
     }
