@@ -1,7 +1,6 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -32,16 +31,10 @@ public class DatabaseLoader implements CommandLineRunner {
     // USER POKEMON
     userPokemonRepo.deleteAll();
 
-    final UserPokemon jinpaBulbasaur = userPokemonRepo.insert(
-        new UserPokemon(1, "Bulbasaur", "Grass/Poison", "Bulbasaur Candy",
-            25, 14, 10, true, false, false));
-
     // USER
     userRepo.deleteAll();
-
-    final List<UserPokemon> jinpaBackpack = new ArrayList<UserPokemon>();
-    jinpaBackpack.add(jinpaBulbasaur);
-    userRepo.insert(new User("JinpaLhawang", jinpaBackpack));
+    userRepo.insert(new User("JinpaLhawang", new ArrayList<UserPokemon>()));
+    userRepo.insert(new User("Raoul", new ArrayList<UserPokemon>()));
   }
 
 }

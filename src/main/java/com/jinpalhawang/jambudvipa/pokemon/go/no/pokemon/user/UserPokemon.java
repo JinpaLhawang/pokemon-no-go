@@ -8,11 +8,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserPokemon {
 
   private @Id String id;
+  private String userId;
   private Integer number;
   private String name;
   private String type;
   private String candyToEvolve;
   private Integer numCandyToEvolve;
+  private String wildPokemonId;
   private Integer combatPoints;
   private Integer healthPoints;
   private boolean captured;
@@ -22,21 +24,25 @@ public class UserPokemon {
   private @SuppressWarnings("unused") UserPokemon() {}
 
   public UserPokemon(
+      String userId,
       Integer number,
       String name,
       String type,
       String candyToEvolve,
       Integer numCandyToEvolve,
+      String wildPokemonId,
       Integer combatPoints,
       Integer healthPoints,
       boolean captured,
       boolean evolved,
       boolean transferred) {
+    this.userId = userId;
     this.number = number;
     this.name = name;
     this.type = type;
     this.candyToEvolve = candyToEvolve;
     this.numCandyToEvolve = numCandyToEvolve;
+    this.wildPokemonId = wildPokemonId;
     this.combatPoints = combatPoints;
     this.healthPoints = healthPoints;
     this.captured = captured;
@@ -46,6 +52,10 @@ public class UserPokemon {
 
   public String getId() {
     return id;
+  }
+
+  public String getUserId() {
+    return userId;
   }
 
   public Integer getNumber() {
@@ -66,6 +76,10 @@ public class UserPokemon {
 
   public Integer getNumCandyToEvolve() {
     return numCandyToEvolve;
+  }
+
+  public String getWildPokemonId() {
+    return wildPokemonId;
   }
 
   public Integer getCombatPoints() {
@@ -92,6 +106,10 @@ public class UserPokemon {
     this.id = id;
   }
 
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
+
   public void setNumber(Integer number) {
     this.number = number;
   }
@@ -110,6 +128,10 @@ public class UserPokemon {
 
   public void setNumCandyToEvolve(Integer numCandyToEvolve) {
     this.numCandyToEvolve = numCandyToEvolve;
+  }
+
+  public void setWildPokemonId(String wildPokemonId) {
+    this.wildPokemonId = wildPokemonId;
   }
 
   public void setCombatPoints(Integer combatPoints) {
@@ -134,10 +156,10 @@ public class UserPokemon {
 
   @Override
   public String toString() {
-    return "UserPokemon [id=" + id + ", number=" + number + ", name=" + name + ", type=" + type + ", candyToEvolve="
-        + candyToEvolve + ", numCandyToEvolve=" + numCandyToEvolve + ", combatPoints=" + combatPoints
-        + ", healthPoints=" + healthPoints + ", captured=" + captured + ", evolved=" + evolved + ", transferred="
-        + transferred + "]";
+    return "UserPokemon [id=" + id + ", userId=" + userId + ", number=" + number + ", name=" + name + ", type=" + type
+        + ", candyToEvolve=" + candyToEvolve + ", numCandyToEvolve=" + numCandyToEvolve + ", wildPokemonId="
+        + wildPokemonId + ", combatPoints=" + combatPoints + ", healthPoints=" + healthPoints + ", captured=" + captured
+        + ", evolved=" + evolved + ", transferred=" + transferred + "]";
   }
 
 }

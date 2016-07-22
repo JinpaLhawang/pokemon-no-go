@@ -27,21 +27,23 @@ public class WildPokemonRestController {
   @Autowired
   private UserPokemonRepository userPokemonRepo;
 
-  @RequestMapping(value = "/api/{wildPokemonId}/capture")
-  public void capture(@PathVariable String wildPokemonId) {
+  @RequestMapping(value = "/api/{userName}/{wildPokemonId}/capture")
+  public void capture(@PathVariable String userName, @PathVariable String wildPokemonId) {
 
+    final User user = userRepo.findByName(userName);
     final WildPokemon wildPokemon = wildPokemonRepo.findOne(wildPokemonId);
-    log.info("Capturing Wild Pokemon: " + wildPokemon);
+    log.info("User: " + userName + " capturing Wild Pokemon: " + wildPokemonId);
 
     wildPokemonRepo.delete(wildPokemon);
 
     final UserPokemon userPokemon = userPokemonRepo.insert(
-        new UserPokemon(wildPokemon.getNumber(), wildPokemon.getName(),
-            wildPokemon.getType(), wildPokemon.getCandyToEvolve(),
-            wildPokemon.getNumCandyToEvolve(), 10, 10, true, false, false));
-    log.info("Caught Wild Pokemon: " + userPokemon);
+        new UserPokemon(user.getName(),
+            wildPokemon.getNumber(), wildPokemon.getName(), wildPokemon.getType(),
+            wildPokemon.getCandyToEvolve(), wildPokemon.getNumCandyToEvolve(),
+            wildPokemon.getId(),
+            10, 10, true, false, false));
+    log.info("User: " + userName + " caught User Pokemon: " + userPokemon);
 
-    final User user = userRepo.findByName("JinpaLhawang");
     user.getBackpack().add(userPokemon);
   }
 

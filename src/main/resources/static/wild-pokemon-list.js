@@ -15,6 +15,7 @@ class WildPokemonList extends React.Component {
       var wildPokemons = this.props.wildPokemons.map(wildPokemon =>
       <WildPokemon
           key={ wildPokemon._links.self.href }
+          userName={ this.props.userName }
           wildPokemon={ wildPokemon }
           attributes={ this.props.attributes }
           onWildPokemonCapture={ this.props.onWildPokemonCapture }

@@ -1,6 +1,7 @@
 'use strict';
 
 const React = require('react');
+const Cookie = require('react-cookie');
 
 const client = require('./client');
 const follow = require('./follow');
@@ -17,7 +18,11 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+    Cookie.save('UserName', 'JinpaLhawang');
     this.state = {
+      user: {
+        name: Cookie.load('UserName')
+      },
       wildPokemonList: {
         wildPokemons: [],
         attributes: [],
@@ -41,6 +46,9 @@ class App extends React.Component {
       }
     };
 
+    this.switchToJinpaLhawang = this.switchToJinpaLhawang.bind(this);
+    this.switchToRaoul = this.switchToRaoul.bind(this);
+
     this.updateUserPokemonListPageSize = this.updateUserPokemonListPageSize.bind(this);
     this.onUserPokemonListNavigate = this.onUserPokemonListNavigate.bind(this);
     this.updatePokemonListPageSize = this.updatePokemonListPageSize.bind(this);
@@ -56,6 +64,16 @@ class App extends React.Component {
     this.refreshUserPokemonListAndGoToLastPage = this.refreshUserPokemonListAndGoToLastPage.bind(this);
     this.refreshPokemonListCurrentPage = this.refreshPokemonListCurrentPage.bind(this);
     this.refreshPokemonListAndGoToLastPage = this.refreshPokemonListAndGoToLastPage.bind(this);
+  }
+
+  switchToJinpaLhawang(e) {
+    this.setState({ user: { name: 'JinpaLhawang' } });
+    this.loadUserPokemonListFromServer('JinpaLhawang', this.state.userPokemonList.pageSize)
+  }
+
+  switchToRaoul(e) {
+    this.setState({ user: { name: 'Raoul' } });
+    this.loadUserPokemonListFromServer('Raoul', this.state.userPokemonList.pageSize)
   }
 
   // LOAD
@@ -83,23 +101,17 @@ class App extends React.Component {
     });
   }
 
-  loadUserPokemonListFromServer(pageSize) {
-    let relArray = [ { rel: 'userPokemons', params: { size: pageSize } } ];
+  loadUserPokemonListFromServer(userName, pageSize) {
+    let relArray = [
+      'userPokemons',
+      'search',
+      { rel: 'findByUserId', params: { userId: userName, size: pageSize } }
+    ];
     follow(client, root, relArray).then(userPokemonCollection => {
-      return client({
-        method: 'GET',
-        path: userPokemonCollection.entity._links.profile.href,
-        headers: { 'Accept': 'application/schema+json' }
-      }).then(schema => {
-        this.schema = schema.entity;
-        return userPokemonCollection;
-      });
-    }).done(userPokemonCollection => {
       this.setState({
         userPokemonList: {
           userPokemons: userPokemonCollection.entity._embedded.userPokemons,
           links: userPokemonCollection.entity._links,
-          attributes: Object.keys(this.schema.properties),
           pageSize: pageSize,
           page: userPokemonCollection.entity.page
         }
@@ -134,7 +146,7 @@ class App extends React.Component {
   // NAVIGATION
   updateUserPokemonListPageSize(pageSize) {
     if (pageSize !== this.state.userPokemonList.pageSize) {
-      this.loadUserPokemonListFromServer(pageSize);
+      this.loadUserPokemonListFromServer(this.state.user.name, pageSize);
     }
   }
 
@@ -179,11 +191,10 @@ class App extends React.Component {
   }
 
   // CRUD
-  onWildPokemonCapture(wildPokemon) {
-    console.log('Capturing wildPokemon', wildPokemon);
+  onWildPokemonCapture(userName, wildPokemon) {
     client({
       method: 'GET',
-      path: '/api/' + wildPokemon.id + '/capture'
+      path: '/api/' + userName + '/' + wildPokemon.id + '/capture'
     });
   }
 
@@ -249,12 +260,22 @@ class App extends React.Component {
   }
 
   refreshUserPokemonListAndGoToLastPage(message) {
-    let relArray = [ { rel: 'userPokemons', params: { size: this.state.userPokemonList.pageSize } } ];
-    follow(client, root, relArray).done(response => {
-      if (response.entity._links.last !== undefined) {
-        this.onUserPokemonListNavigate(response.entity._links.last.href);
+    let relArray = [
+      'userPokemons',
+      'search',
+      {
+        rel: 'findByUserId',
+        params: {
+          userId: this.state.user.name,
+          size: this.state.userPokemonList.pageSize
+        }
+      }
+    ];
+    follow(client, root, relArray).done(userPokemonCollection => {
+      if (userPokemonCollection.entity._links.last !== undefined) {
+        this.onUserPokemonListNavigate(userPokemonCollection.entity._links.last.href);
       } else {
-        this.onUserPokemonListNavigate(response.entity._links.self.href);
+        this.onUserPokemonListNavigate(userPokemonCollection.entity._links.self.href);
       }
     });
   }
@@ -264,29 +285,22 @@ class App extends React.Component {
       this.refreshUserPokemonListAndGoToLastPage(message);
     } else {
       let relArray = [
+        'userPokemons',
+        'search',
         {
-          rel: 'userPokemons',
+          rel: 'findByUserId',
           params: {
+            userId: this.state.user.name,
             size: this.state.userPokemonList.pageSize,
             page: this.state.userPokemonList.page.number
           }
         }
       ];
       follow(client, root, relArray).then(userPokemonCollection => {
-        return client({
-          method: 'GET',
-          path: userPokemonCollection.entity._links.profile.href,
-          headers: { 'Accept': 'application/schema+json' }
-        }).then(schema => {
-          this.schema = schema.entity;
-          return userPokemonCollection;
-        });
-      }).done(userPokemonCollection => {
         this.setState({
           userPokemonList: {
             userPokemons: userPokemonCollection.entity._embedded.userPokemons,
             links: userPokemonCollection.entity._links,
-            attributes: Object.keys(this.schema.properties),
             pageSize: this.state.userPokemonList.pageSize,
             page: userPokemonCollection.entity.page
           }
@@ -345,7 +359,7 @@ class App extends React.Component {
   // INIT
   componentDidMount() {
     this.loadWildPokemonListFromServer(this.state.wildPokemonList.pageSize);
-    this.loadUserPokemonListFromServer(this.state.userPokemonList.pageSize);
+    this.loadUserPokemonListFromServer(this.state.user.name, this.state.userPokemonList.pageSize);
     this.loadPokemonListFromServer(this.state.pokemonList.pageSize);
     stompClient.register([
       { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
@@ -367,7 +381,16 @@ class App extends React.Component {
 
         <h1>Pokemon No Go</h1>
 
+        <a href='#' onClick={ this.switchToJinpaLhawang }>
+          JinpaLhawang
+        </a>
+        &nbsp;|&nbsp;
+        <a href='#' onClick={ this.switchToRaoul }>
+          Raoul
+        </a>
+
         <WildPokemonList
+            userName={ this.state.user.name }
             wildPokemons={ this.state.wildPokemonList.wildPokemons }
             links={ this.state.wildPokemonList.links }
             attributes={ this.state.wildPokemonList.attributes }
@@ -377,6 +400,7 @@ class App extends React.Component {
         />
 
         <UserPokemonList
+            userName={ this.state.user.name }
             userPokemons={ this.state.userPokemonList.userPokemons }
             links={ this.state.userPokemonList.links }
             attributes={ this.state.userPokemonList.attributes }

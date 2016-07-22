@@ -10,7 +10,7 @@ class WildPokemon extends React.Component {
   }
 
   handleCapture() {
-    this.props.onWildPokemonCapture(this.props.wildPokemon);
+    this.props.onWildPokemonCapture(this.props.userName, this.props.wildPokemon);
   }
 
   render() {
