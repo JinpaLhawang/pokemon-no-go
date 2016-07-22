@@ -45,7 +45,7 @@ class App extends React.Component {
       }
     };
 
-    this.handleUserNameInput = this.handleUserNameInput.bind(this);
+    this.handleUserNameSelect = this.handleUserNameSelect.bind(this);
 
     this.updateUserPokemonListPageSize = this.updateUserPokemonListPageSize.bind(this);
     this.onUserPokemonListNavigate = this.onUserPokemonListNavigate.bind(this);
@@ -64,7 +64,7 @@ class App extends React.Component {
     this.refreshPokemonListAndGoToLastPage = this.refreshPokemonListAndGoToLastPage.bind(this);
   }
 
-  handleUserNameInput(e) {
+  handleUserNameSelect(e) {
     e.preventDefault();
     var userName = React.findDOMNode(this.refs.userName).value;
     console.log('userName:', userName);
@@ -403,11 +403,10 @@ class App extends React.Component {
         <h1>Pokemon No Go</h1>
 
         <div>
-          <input
-              ref='userName'
-              defaultValue='JinpaLhawang'
-              onKeyPress={ this.handleUserNameInput }
-          />
+          <select id='userName' onChange={ this.handleUserNameSelect }>
+            <option value:'JinpaLhawang'>JinpaLhawang</option>
+            <option value:'Raoul'>Raoul</option>
+          </select>
         </div>
 
         <WildPokemonList
