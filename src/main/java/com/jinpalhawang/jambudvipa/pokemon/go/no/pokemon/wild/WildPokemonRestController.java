@@ -48,6 +48,12 @@ public class WildPokemonRestController {
             wildPokemon.getId(),
             10, 10));
     log.info("User: " + userName + " caught User Pokemon: " + userPokemon);
+
+    // Increase User Experience Points
+    user.increaseExperiencePoints(100);
+
+    // Save User
+    userRepo.save(user);
   }
 
 }

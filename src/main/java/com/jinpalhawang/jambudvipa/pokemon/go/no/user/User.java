@@ -18,6 +18,10 @@ public class User {
   private @NonNull String name;
   private @NonNull Integer level;
   private @NonNull Integer experiencePoints;
-  private @NonNull Integer starDust;
+  private @NonNull Integer stardust;
+
+  public void increaseExperiencePoints(final Integer amount) {
+    this.experiencePoints = experiencePoints + amount;
+  }
 
 }

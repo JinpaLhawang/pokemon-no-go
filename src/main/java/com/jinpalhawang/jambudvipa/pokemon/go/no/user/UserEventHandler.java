@@ -22,13 +22,13 @@ public class UserEventHandler extends AbstractMongoEventListener<User> {
 
   @Override
   public void onAfterSave(AfterSaveEvent<User> event) {
-    log.info("MongoDB AfterSaveEvent: " + event.getSource());
+    log.info("MongoDB User AfterSaveEvent: " + event.getSource());
     this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/updateUser", "");
   }
 
   @Override
   public void onAfterDelete(AfterDeleteEvent<User> event) {
-    log.info("MongoDB AfterDeleteEvent: " + event.getSource());
+    log.info("MongoDB User AfterDeleteEvent: " + event.getSource());
     this.websocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/deleteUser", "");
   }
 

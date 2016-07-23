@@ -47,6 +47,13 @@ public class WildPokemonGenerator implements CommandLineRunner {
     // WILD POKEMON
     wildPokemonRepo.deleteAll();
 
+    final List<Pokemon> pokemons2 = pokemonRepo.findAll();
+    final Pokemon pokemon2 = pokemons2.get(random.nextInt(pokemons2.size()));
+    log.info("Spawning random Pokemon: " + pokemon2);
+    wildPokemonRepo.insert(new WildPokemon(pokemon2.getNumber(),
+        pokemon2.getName(), pokemon2.getType(), pokemon2.getCandyToEvolve(),
+        pokemon2.getNumCandyToEvolve()));
+
     // BEGIN SPAWNING!
     while (true) {
       Thread.sleep(5000);

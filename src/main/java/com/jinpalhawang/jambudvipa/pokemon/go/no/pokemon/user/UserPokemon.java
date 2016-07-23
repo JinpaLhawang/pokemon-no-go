@@ -28,5 +28,4 @@ public class UserPokemon {
   private boolean captured = true;
   private boolean evolved = false;
   private boolean transferred = false;
-
 }

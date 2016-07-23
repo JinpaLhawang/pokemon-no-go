@@ -22,7 +22,10 @@ class App extends React.Component {
     Cookie.save('UserName', 'JinpaLhawang');
     this.state = {
       user: {
-        name: Cookie.load('UserName')
+        name: Cookie.load('UserName'),
+        level: 1,
+        experiencePoints: 0,
+        stardust: 0
       },
       wildPokemonList: {
         wildPokemons: [],
@@ -51,6 +54,9 @@ class App extends React.Component {
     this.switchToJinpaLhawang = this.switchToJinpaLhawang.bind(this);
     this.switchToRaoul = this.switchToRaoul.bind(this);
 
+    this.loadUser = this.loadUser.bind(this);
+    this.reloadUser = this.reloadUser.bind(this);
+
     this.updateUserPokemonListPageSize = this.updateUserPokemonListPageSize.bind(this);
     this.onUserPokemonListNavigate = this.onUserPokemonListNavigate.bind(this);
     this.updatePokemonListPageSize = this.updatePokemonListPageSize.bind(this);
@@ -77,16 +83,16 @@ class App extends React.Component {
         stardust: this.state.user.stardust
       }
     });
+    this.loadUser(name);
+    this.loadUserPokemonListFromServer(name, this.state.userPokemonList.pageSize)
   }
 
   switchToJinpaLhawang(e) {
     this.switchUser('JinpaLhawang');
-    this.loadUserPokemonListFromServer('JinpaLhawang', this.state.userPokemonList.pageSize)
   }
 
   switchToRaoul(e) {
     this.switchUser('Raoul');
-    this.loadUserPokemonListFromServer('Raoul', this.state.userPokemonList.pageSize)
   }
 
   // USER
@@ -95,17 +101,20 @@ class App extends React.Component {
       method: 'GET',
       path: '/api/users/search/findByName?name=' + name
     }).done(response => {
-      console.log('response', response);
       const user = response.entity;
       this.setState({
         user: {
           name: user.name,
           level: user.level,
-          exeriencePoints: user.exeriencePoints,
+          experiencePoints: user.experiencePoints,
           stardust: user.stardust
         }
       });
     });
+  }
+
+  reloadUser() {
+    this.loadUser(this.state.user.name);
   }
 
   // LOAD
@@ -394,7 +403,7 @@ class App extends React.Component {
     // User
     this.loadUser(this.state.user.name);
     stompClient.register([
-      { route: '/topic/updateUser', callback: this.loadUser }
+      { route: '/topic/updateUser', callback: this.reloadUser }
     ]);
 
     // Wild Pokemon

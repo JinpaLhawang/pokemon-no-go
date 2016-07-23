@@ -14,7 +14,7 @@ class User extends React.Component {
         <h3>{ this.props.user.name }</h3>
 
         <p>Level: <strong>{ this.props.user.level }</strong></p>
-        <p>Experience Points: <strong>{ this.props.user.exeriencePoints ? this.props.user.exeriencePoints : 0 }</strong></p>
+        <p>Experience Points: <strong>{ this.props.user.experiencePoints ? this.props.user.experiencePoints : 0 }</strong></p>
         <p>Stardust: <strong>{ this.props.user.stardust ? this.props.user.stardust : 0 }</strong></p>
 
         <table>
