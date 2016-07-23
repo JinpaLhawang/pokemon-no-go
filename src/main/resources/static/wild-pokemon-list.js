@@ -26,7 +26,7 @@ class WildPokemonList extends React.Component {
     return (
       <div>
 
-      <h3>Wild Pokemons</h3>
+        <h3>Wild Pokemons</h3>
 
         <table>
           <tr>
