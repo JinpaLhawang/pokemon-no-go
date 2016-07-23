@@ -46,7 +46,7 @@ public class WildPokemonRestController {
             wildPokemon.getNumber(), wildPokemon.getName(), wildPokemon.getType(),
             wildPokemon.getCandyToEvolve(), wildPokemon.getNumCandyToEvolve(),
             wildPokemon.getId(),
-            10, 10, true, false, false));
+            10, 10));
     log.info("User: " + userName + " caught User Pokemon: " + userPokemon);
   }
 
