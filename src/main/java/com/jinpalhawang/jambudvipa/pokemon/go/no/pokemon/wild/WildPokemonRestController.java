@@ -37,8 +37,9 @@ public class WildPokemonRestController {
     final WildPokemon wildPokemon = wildPokemonRepo.findOne(wildPokemonId);
     log.info("User: " + userName + " capturing Wild Pokemon: " + wildPokemonId);
 
-    // Delete Wild Pokemon
-    wildPokemonRepo.delete(wildPokemon);
+    // Tag Wild Pokemon
+    wildPokemon.getTaggedByUser().add(userName);
+    wildPokemonRepo.save(wildPokemon);
 
     // Insert User Pokemon
     final UserPokemon userPokemon = userPokemonRepo.insert(

@@ -1,5 +1,7 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.wild;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,5 +24,6 @@ public class WildPokemon {
   private @NonNull String type;
   private @NonNull String candyToEvolve;
   private @NonNull Integer numCandyToEvolve;
+  private @NonNull List<String> taggedByUser;
 
 }

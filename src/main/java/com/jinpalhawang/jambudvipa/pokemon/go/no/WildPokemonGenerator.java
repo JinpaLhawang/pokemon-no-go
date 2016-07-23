@@ -1,5 +1,6 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -52,28 +53,18 @@ public class WildPokemonGenerator implements CommandLineRunner {
     log.info("Spawning random Pokemon: " + pokemon2);
     wildPokemonRepo.insert(new WildPokemon(pokemon2.getNumber(),
         pokemon2.getName(), pokemon2.getType(), pokemon2.getCandyToEvolve(),
-        pokemon2.getNumCandyToEvolve()));
+        pokemon2.getNumCandyToEvolve(), new ArrayList<String>()));
 
     // BEGIN SPAWNING!
     while (true) {
-      Thread.sleep(5000);
-      if (random.nextInt(10) > 7) {
-        final List<WildPokemon> wildPokemons = wildPokemonRepo.findAll();
-        if (!wildPokemons.isEmpty()) {
-          final WildPokemon wildPokemon = wildPokemons.get(
-              random.nextInt(wildPokemons.size()));
-          log.info("Wild Pokemon went away: " + wildPokemon);
-          wildPokemonRepo.delete(wildPokemon);
-        }
-      }
-      Thread.sleep(5000);
-      if (random.nextInt(10) > 6) {
+      Thread.sleep(10000);
+      if (random.nextInt(10) > 2) {
         final List<Pokemon> pokemons = pokemonRepo.findAll();
         final Pokemon pokemon = pokemons.get(random.nextInt(pokemons.size()));
         log.info("Spawning random Pokemon: " + pokemon);
         wildPokemonRepo.insert(new WildPokemon(pokemon.getNumber(),
             pokemon.getName(), pokemon.getType(), pokemon.getCandyToEvolve(),
-            pokemon.getNumCandyToEvolve()));
+            pokemon.getNumCandyToEvolve(), new ArrayList<String>()));
       }
     }
   }

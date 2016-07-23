@@ -84,6 +84,7 @@ class App extends React.Component {
       }
     });
     this.loadUser(name);
+    this.loadWildPokemonListFromServer(name, this.state.wildPokemonList.pageSize);
     this.loadUserPokemonListFromServer(name, this.state.userPokemonList.pageSize)
   }
 
@@ -118,23 +119,17 @@ class App extends React.Component {
   }
 
   // LOAD
-  loadWildPokemonListFromServer(pageSize) {
-    let relArray = [ { rel: 'wildPokemons', params: { size: pageSize } } ];
+  loadWildPokemonListFromServer(userName, pageSize) {
+    let relArray = [
+      'wildPokemons',
+      'search',
+      { rel: 'findByTaggedByUserNot', params: { userId: userName, size: pageSize } }
+    ];
     follow(client, root, relArray).then(wildPokemonCollection => {
-      return client({
-        method: 'GET',
-        path: wildPokemonCollection.entity._links.profile.href,
-        headers: { 'Accept': 'application/schema+json' }
-      }).then(schema => {
-        this.schema = schema.entity;
-        return wildPokemonCollection;
-      });
-    }).done(wildPokemonCollection => {
       this.setState({
         wildPokemonList: {
           wildPokemons: wildPokemonCollection.entity._embedded.wildPokemons,
           links: wildPokemonCollection.entity._links,
-          attributes: Object.keys(this.schema.properties),
           pageSize: pageSize,
           page: wildPokemonCollection.entity.page
         }
@@ -270,29 +265,21 @@ class App extends React.Component {
   // REFRESH
   refreshWildPokemonList(message) {
     let relArray = [
+      'wildPokemons',
+      'search',
       {
-        rel: 'wildPokemons',
+        rel: 'findByTaggedByUserNot',
         params: {
-          size: this.state.wildPokemonList.pageSize,
-          page: this.state.wildPokemonList.page.number
+          userId: this.state.user.name,
+          size: this.state.wildPokemonList.pageSize
         }
       }
     ];
     follow(client, root, relArray).then(wildPokemonCollection => {
-      return client({
-        method: 'GET',
-        path: wildPokemonCollection.entity._links.profile.href,
-        headers: { 'Accept': 'application/schema+json' }
-      }).then(schema => {
-        this.schema = schema.entity;
-        return wildPokemonCollection;
-      });
-    }).done(wildPokemonCollection => {
       this.setState({
         wildPokemonList: {
           wildPokemons: wildPokemonCollection.entity._embedded.wildPokemons,
           links: wildPokemonCollection.entity._links,
-          attributes: Object.keys(this.schema.properties),
           pageSize: this.state.wildPokemonList.pageSize,
           page: wildPokemonCollection.entity.page
         }
@@ -407,7 +394,7 @@ class App extends React.Component {
     ]);
 
     // Wild Pokemon
-    this.loadWildPokemonListFromServer(this.state.wildPokemonList.pageSize);
+    this.loadWildPokemonListFromServer(this.state.user.name, this.state.wildPokemonList.pageSize);
     stompClient.register([
       { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
       { route: '/topic/updateWildPokemon', callback: this.refreshWildPokemonList },
