@@ -7,6 +7,7 @@ const client = require('./client');
 const follow = require('./follow');
 const stompClient = require('./websocket-listener');
 
+const User = require('./user');
 const WildPokemonList = require('./wild-pokemon-list');
 const UserPokemonList = require('./user-pokemon-list');
 const PokemonList = require('./pokemon-list');
@@ -46,6 +47,7 @@ class App extends React.Component {
       }
     };
 
+    this.switchUser = this.switchUser.bind(this);
     this.switchToJinpaLhawang = this.switchToJinpaLhawang.bind(this);
     this.switchToRaoul = this.switchToRaoul.bind(this);
 
@@ -66,14 +68,44 @@ class App extends React.Component {
     this.refreshPokemonListAndGoToLastPage = this.refreshPokemonListAndGoToLastPage.bind(this);
   }
 
+  switchUser(name) {
+    this.setState({
+      user: {
+        name: name,
+        level: this.state.user.level,
+        experiencePoints: this.state.user.experiencePoints,
+        stardust: this.state.user.stardust
+      }
+    });
+  }
+
   switchToJinpaLhawang(e) {
-    this.setState({ user: { name: 'JinpaLhawang' } });
+    this.switchUser('JinpaLhawang');
     this.loadUserPokemonListFromServer('JinpaLhawang', this.state.userPokemonList.pageSize)
   }
 
   switchToRaoul(e) {
-    this.setState({ user: { name: 'Raoul' } });
+    this.switchUser('Raoul');
     this.loadUserPokemonListFromServer('Raoul', this.state.userPokemonList.pageSize)
+  }
+
+  // USER
+  loadUser(name) {
+    client({
+      method: 'GET',
+      path: '/api/users/search/findByName?name=' + name
+    }).done(response => {
+      console.log('response', response);
+      const user = response.entity;
+      this.setState({
+        user: {
+          name: user.name,
+          level: user.level,
+          exeriencePoints: user.exeriencePoints,
+          stardust: user.stardust
+        }
+      });
+    });
   }
 
   // LOAD
@@ -358,16 +390,32 @@ class App extends React.Component {
 
   // INIT
   componentDidMount() {
+
+    // User
+    this.loadUser(this.state.user.name);
+    stompClient.register([
+      { route: '/topic/updateUser', callback: this.loadUser }
+    ]);
+
+    // Wild Pokemon
     this.loadWildPokemonListFromServer(this.state.wildPokemonList.pageSize);
-    this.loadUserPokemonListFromServer(this.state.user.name, this.state.userPokemonList.pageSize);
-    this.loadPokemonListFromServer(this.state.pokemonList.pageSize);
     stompClient.register([
       { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
       { route: '/topic/updateWildPokemon', callback: this.refreshWildPokemonList },
-      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList },
+      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList }
+    ]);
+
+    // User Pokemon
+    this.loadUserPokemonListFromServer(this.state.user.name, this.state.userPokemonList.pageSize);
+    stompClient.register([
       { route: '/topic/newUserPokemon', callback: this.refreshUserPokemonListAndGoToLastPage },
       { route: '/topic/updateUserPokemon', callback: this.refreshUserPokemonListCurrentPage },
-      { route: '/topic/deleteUserPokemon', callback: this.refreshUserPokemonListCurrentPage },
+      { route: '/topic/deleteUserPokemon', callback: this.refreshUserPokemonListCurrentPage }
+    ]);
+
+    // Pokemon
+    this.loadPokemonListFromServer(this.state.pokemonList.pageSize);
+    stompClient.register([
       { route: '/topic/newPokemon', callback: this.refreshPokemonListAndGoToLastPage },
       { route: '/topic/updatePokemon', callback: this.refreshPokemonListCurrentPage },
       { route: '/topic/deletePokemon', callback: this.refreshPokemonListCurrentPage }
@@ -405,7 +453,9 @@ class App extends React.Component {
             />
           </div>
 
-          <div className="col-md-4">User</div>
+          <div className="col-md-4">
+            <User user={ this.state.user } />
+          </div>
 
         </div>
 

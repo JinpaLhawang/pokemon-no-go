@@ -1,24 +1,28 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no.user;
 
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemon;
 
 @Document
 public class User {
 
   private @Id String id;
   private String name;
-  private List<UserPokemon> backpack;
+  private Integer level;
+  private Integer experiencePoints;
+  private Integer starDust;
 
   private @SuppressWarnings("unused") User() {}
 
-  public User(String name, List<UserPokemon> backpack) {
+  public User(
+      String name,
+      Integer level,
+      Integer experiencePoints,
+      Integer starDust) {
     this.name = name;
-    this.backpack = backpack;
+    this.level = level;
+    this.experiencePoints = experiencePoints;
+    this.starDust = starDust;
   }
 
   public String getId() {
@@ -29,8 +33,16 @@ public class User {
     return name;
   }
 
-  public List<UserPokemon> getBackpack() {
-    return backpack;
+  public Integer getLevel() {
+    return level;
+  }
+
+  public Integer getExperiencePoints() {
+    return experiencePoints;
+  }
+
+  public Integer getStarDust() {
+    return starDust;
   }
 
   public void setId(String id) {
@@ -41,13 +53,22 @@ public class User {
     this.name = name;
   }
 
-  public void setBackpack(List<UserPokemon> backpack) {
-    this.backpack = backpack;
+  public void setLevel(Integer level) {
+    this.level = level;
+  }
+
+  public void setExperiencePoints(Integer experiencePoints) {
+    this.experiencePoints = experiencePoints;
+  }
+
+  public void setStarDust(Integer starDust) {
+    this.starDust = starDust;
   }
 
   @Override
   public String toString() {
-    return "User [id=" + id + ", name=" + name + ", backpack=" + backpack + "]";
+    return "User [id=" + id + ", name=" + name + ", level=" + level + ", experiencePoints=" + experiencePoints
+        + ", starDust=" + starDust + "]";
   }
 
 }

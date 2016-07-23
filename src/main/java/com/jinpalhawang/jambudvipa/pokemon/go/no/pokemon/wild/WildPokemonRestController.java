@@ -43,8 +43,6 @@ public class WildPokemonRestController {
             wildPokemon.getId(),
             10, 10, true, false, false));
     log.info("User: " + userName + " caught User Pokemon: " + userPokemon);
-
-    user.getBackpack().add(userPokemon);
   }
 
 }

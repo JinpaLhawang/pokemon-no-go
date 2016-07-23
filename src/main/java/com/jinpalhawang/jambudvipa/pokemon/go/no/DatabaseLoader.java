@@ -1,12 +1,9 @@
 package com.jinpalhawang.jambudvipa.pokemon.go.no;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemon;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.pokemon.user.UserPokemonRepository;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.user.User;
 import com.jinpalhawang.jambudvipa.pokemon.go.no.user.UserRepository;
@@ -33,8 +30,8 @@ public class DatabaseLoader implements CommandLineRunner {
 
     // USER
     userRepo.deleteAll();
-    userRepo.insert(new User("JinpaLhawang", new ArrayList<UserPokemon>()));
-    userRepo.insert(new User("Raoul", new ArrayList<UserPokemon>()));
+    userRepo.insert(new User("JinpaLhawang", 1, 0, 0));
+    userRepo.insert(new User("Raoul", 1, 0, 0));
   }
 
 }
