@@ -30,12 +30,17 @@ public class WildPokemonRestController {
   @RequestMapping(value = "/api/{userName}/{wildPokemonId}/capture")
   public void capture(@PathVariable String userName, @PathVariable String wildPokemonId) {
 
+    // Get User
     final User user = userRepo.findByName(userName);
+
+    // Get Wild Pokemon
     final WildPokemon wildPokemon = wildPokemonRepo.findOne(wildPokemonId);
     log.info("User: " + userName + " capturing Wild Pokemon: " + wildPokemonId);
 
+    // Delete Wild Pokemon
     wildPokemonRepo.delete(wildPokemon);
 
+    // Insert User Pokemon
     final UserPokemon userPokemon = userPokemonRepo.insert(
         new UserPokemon(user.getName(),
             wildPokemon.getNumber(), wildPokemon.getName(), wildPokemon.getType(),
