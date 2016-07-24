@@ -2,6 +2,7 @@
 
 const React = require('react');
 const Cookie = require('react-cookie');
+const moment = require('moment');
 
 const client = require('./client');
 const follow = require('./follow');
@@ -67,7 +68,7 @@ class App extends React.Component {
     this.onUpdate = this.onUpdate.bind(this);
     this.onDelete = this.onDelete.bind(this);
 
-    this.refreshWildPokemonList = this.refreshWildPokemonList.bind(this);
+    this.reloadWildPokemons = this.reloadWildPokemons.bind(this);
     this.refreshUserPokemonListCurrentPage = this.refreshUserPokemonListCurrentPage.bind(this);
     this.refreshUserPokemonListAndGoToLastPage = this.refreshUserPokemonListAndGoToLastPage.bind(this);
     this.refreshPokemonListCurrentPage = this.refreshPokemonListCurrentPage.bind(this);
@@ -84,7 +85,7 @@ class App extends React.Component {
       }
     });
     this.loadUser(name);
-    this.loadWildPokemonListFromServer(name, this.state.wildPokemonList.pageSize);
+    this.loadWildPokemons(name, this.state.wildPokemonList.pageSize);
     this.loadUserPokemonListFromServer(name, this.state.userPokemonList.pageSize)
   }
 
@@ -118,12 +119,19 @@ class App extends React.Component {
     this.loadUser(this.state.user.name);
   }
 
-  // LOAD
-  loadWildPokemonListFromServer(userName, pageSize) {
+  // WILD POKEMON
+  loadWildPokemons(userName, pageSize) {
     let relArray = [
       'wildPokemons',
       'search',
-      { rel: 'findByTaggedByUserNot', params: { userId: userName, size: pageSize } }
+      {
+        rel: 'findByAvailableIsTrueAndTaggedByUserNot',
+        params: {
+          date: moment().format('YYYY-MM-DDThh:mm:ss.SSSZZ'),
+          userId: userName,
+          size: pageSize
+        }
+      }
     ];
     follow(client, root, relArray).then(wildPokemonCollection => {
       this.setState({
@@ -137,6 +145,11 @@ class App extends React.Component {
     });
   }
 
+  reloadWildPokemons(message) {
+    this.loadWildPokemons(this.state.user.name, this.state.wildPokemonList.pageSize);
+  }
+
+  // WILD POKEMON
   loadUserPokemonListFromServer(userName, pageSize) {
     let relArray = [
       'userPokemons',
@@ -155,6 +168,7 @@ class App extends React.Component {
     });
   }
 
+  // POKEMON
   loadPokemonListFromServer(pageSize) {
     let relArray = [ { rel: 'pokemons', params: { size: pageSize } } ];
     follow(client, root, relArray).then(pokemonCollection => {
@@ -263,30 +277,6 @@ class App extends React.Component {
   }
 
   // REFRESH
-  refreshWildPokemonList(message) {
-    let relArray = [
-      'wildPokemons',
-      'search',
-      {
-        rel: 'findByTaggedByUserNot',
-        params: {
-          userId: this.state.user.name,
-          size: this.state.wildPokemonList.pageSize
-        }
-      }
-    ];
-    follow(client, root, relArray).then(wildPokemonCollection => {
-      this.setState({
-        wildPokemonList: {
-          wildPokemons: wildPokemonCollection.entity._embedded.wildPokemons,
-          links: wildPokemonCollection.entity._links,
-          pageSize: this.state.wildPokemonList.pageSize,
-          page: wildPokemonCollection.entity.page
-        }
-      });
-    });
-  }
-
   refreshUserPokemonListAndGoToLastPage(message) {
     let relArray = [
       'userPokemons',
@@ -394,11 +384,11 @@ class App extends React.Component {
     ]);
 
     // Wild Pokemon
-    this.loadWildPokemonListFromServer(this.state.user.name, this.state.wildPokemonList.pageSize);
+    this.loadWildPokemons(this.state.user.name, this.state.wildPokemonList.pageSize);
     stompClient.register([
-      { route: '/topic/newWildPokemon', callback: this.refreshWildPokemonList },
-      { route: '/topic/updateWildPokemon', callback: this.refreshWildPokemonList },
-      { route: '/topic/deleteWildPokemon', callback: this.refreshWildPokemonList }
+      { route: '/topic/newWildPokemon', callback: this.reloadWildPokemons },
+      { route: '/topic/updateWildPokemon', callback: this.reloadWildPokemons },
+      { route: '/topic/deleteWildPokemon', callback: this.reloadWildPokemons }
     ]);
 
     // User Pokemon

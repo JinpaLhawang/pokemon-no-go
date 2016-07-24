@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +56,18 @@ public class WildPokemonGenerator implements CommandLineRunner {
         pokemon2.getName(), pokemon2.getType(), pokemon2.getCandyToEvolve(),
         pokemon2.getNumCandyToEvolve(), new ArrayList<String>()));
 
-    // BEGIN SPAWNING!
+    // EVENT LOOP
     while (true) {
-      Thread.sleep(10000);
-      if (random.nextInt(10) > 2) {
+
+      // Despawn Wild Pokemon
+      wildPokemonRepo.findByAvailableIsTrue().forEach(wildPokemon -> {
+        if (wildPokemon.getDespawnDate().isBeforeNow()) {
+          wildPokemon.setAvailable(false);
+          wildPokemonRepo.save(wildPokemon);
+        }
+      });
+
+      if (random.nextInt(10) < 1) {
         final List<Pokemon> pokemons = pokemonRepo.findAll();
         final Pokemon pokemon = pokemons.get(random.nextInt(pokemons.size()));
         log.info("Spawning random Pokemon: " + pokemon);
@@ -66,6 +75,8 @@ public class WildPokemonGenerator implements CommandLineRunner {
             pokemon.getName(), pokemon.getType(), pokemon.getCandyToEvolve(),
             pokemon.getNumCandyToEvolve(), new ArrayList<String>()));
       }
+
+      Thread.sleep(30000);
     }
   }
 
